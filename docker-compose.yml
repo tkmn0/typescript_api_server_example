@@ -1,0 +1,27 @@
+version: '3'
+services: 
+    db: 
+      build: ./mysql/
+      env_file: 
+        - ./.env
+      environment: 
+        TZ: 'Asia/Tokyo'
+      ports:
+        - $DB_PORT:3306
+    app:
+      build: ./app/
+      env_file: 
+        - ./.env
+      environment: 
+        TZ: 'Asia/Tokyo'
+      tty: true
+      ports: 
+        - $APP_PORT:3000
+      command: >
+        sh -c "./wait_for_mysql.sh
+        && npm run migrate-db
+        && node ./dist/main.js"
+    nginx:
+      build: ./nginx/
+      ports:
+        - 80:80
